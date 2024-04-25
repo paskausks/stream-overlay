@@ -1,8 +1,10 @@
 extends Node
 
+signal chat_messaged(message: IRCMessage)
+
 const TWITCH_IRC_ADDRESS = "wss://irc-ws.chat.twitch.tv"
 const NICK := "rpwtf"
-const CHANNEL := "#theo" # e.g. "#theo"
+const CHANNEL := "#twitch" # e.g. "#theo"
 
 var _client: WebSocketPeer = WebSocketPeer.new()
 var _token: String
@@ -88,6 +90,7 @@ func _process_line(line: String) -> void:
 	if msg is IRCMessage:
 		var chat_msg := msg as IRCMessage
 		_log("%s: %s" % [chat_msg.nick, chat_msg.message])
+		chat_messaged.emit(chat_msg)
 
 
 func _send_auth() -> void:
