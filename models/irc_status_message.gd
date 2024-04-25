@@ -5,7 +5,6 @@ var code: int
 var message: String
 
 
-@warning_ignore("untyped_declaration")
-func _init(new_code: int, new_message: String):
+func _init(new_code: int, new_message: String) -> void:
 	code = new_code
 	message = new_message

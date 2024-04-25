@@ -7,19 +7,47 @@ const CHANNEL := "#theo" # e.g. "#theo"
 var _client: WebSocketPeer = WebSocketPeer.new()
 var _token: String
 var _auth_sent: bool = false
-static var _status_message_pattern: RegEx = RegEx.create_from_string(r"^:[\w\.]*\s(\d{3}).+:(.*)$")
+static var _status_message_pattern: RegEx = RegEx.create_from_string(r"^:.*\s(\d{3}).+:(.*)$")
 
 
 static func parse_line(line: String) -> IRCMessageBase:
 	var is_status_message: RegExMatch = _status_message_pattern.search(line)
-	if not is_status_message:
-		return IRCMessageBase.new()
+	if is_status_message:
+		var groups: PackedStringArray = is_status_message.strings
+		return IRCStatusMessage.new(
+			int(groups[1]),
+			groups[2],
+		)
 
-	var groups: PackedStringArray = is_status_message.strings
-	return IRCStatusMessage.new(
-		int(groups[1]),
-		groups[2],
+	if "PRIVMSG %s" % CHANNEL in line:
+		return parse_privmsg(line)
+
+	return IRCMessageBase.new()
+
+
+static func parse_privmsg(line: String) -> IRCMessage:
+	var parts: PackedStringArray = line.split(" :")
+	var capabilities_dict: Dictionary = parse_capabilities(parts[0])
+	var message: String = "".join(parts.slice(2)).strip_edges()
+	var color: String = (capabilities_dict.get("color") as String).strip_edges()
+
+	return IRCMessage.new(
+		capabilities_dict.get("id") as String,
+		capabilities_dict.get("display-name") as String,
+		Color.html(color if len(color) else "#FFFFFF"),
+		message,
 	)
+
+
+# e.g. "@badge-info=;badges=moderator/1;client-nonce=b8337bc15c306abf835308035601e672;..."
+# will be split into {"badge-info": null, "badges": "moderator", ...}
+static func parse_capabilities(capabilities_block: String) -> Dictionary:
+	var result: Dictionary = {}
+	for capability_pair: String in capabilities_block.strip_edges().substr(1).split(";"):
+		var part: PackedStringArray = capability_pair.split("=")
+		result[part[0]] = part[1]
+
+	return result
 
 
 func _ready() -> void:
@@ -51,14 +79,20 @@ func _process(_delta: float) -> void:
 
 
 func _process_line(line: String) -> void:
-	_log(line)
-
-	# TODO(rp): handle result, ples
 	var msg: IRCMessageBase = ChatManager.parse_line(line)
+
+	if msg is IRCStatusMessage:
+		var status_msg := msg as IRCStatusMessage
+		_log("[%d] %s" % [status_msg.code, status_msg.message])
+
+	if msg is IRCMessage:
+		var chat_msg := msg as IRCMessage
+		_log("%s: %s" % [chat_msg.nick, chat_msg.message])
 
 
 func _send_auth() -> void:
 	_auth_sent = true
+	_client.send_text("CAP REQ :twitch.tv/membership twitch.tv/tags twitch.tv/commands")
 	_client.send_text("PASS oauth:%s" % _token)
 	_client.send_text("NICK %s" % NICK)
 	_client.send_text("JOIN %s" % CHANNEL)
