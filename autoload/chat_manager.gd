@@ -59,7 +59,6 @@ func _ready() -> void:
 		return
 
 	_client.connect_to_url(TWITCH_IRC_ADDRESS)
-	_get_global_emotes()
 
 
 func _process(_delta: float) -> void:
@@ -113,7 +112,7 @@ func _integration_test() -> void:
 	var msg1: IRCMessage = IRCMessage.new("1", "manlypink", Color.RED, "hello world! Kappa")
 	var msg2: IRCMessage = IRCMessage.new("2", "nat", Color.GRAY, "BabyRage")
 	var msg3: IRCMessage = IRCMessage.new("3", "vito", Color.GREEN, "this is my favorite stream, LUL ig")
-	var msg4: IRCMessage = IRCMessage.new("4", "duck", Color.GOLD, "C++ is the GOAT CoolCap")
+	var msg4: IRCMessage = IRCMessage.new("4", "duck", Color.GOLD, "C++ is the GOAT CoolCat")
 	var msg5: IRCMessage = IRCMessage.new("5", "linus_torwalds", Color.LIME, "Nihil exercitationem est vero placeat fugit laborum. Animi autem amet aut laborum molestiae ut. PogChamp Consequatur deleniti voluptatem et inventore eligendi laboriosam molestias sed. Consectetur ab aut velit blanditiis. Neque enim architecto et eaque esse labore earum.")
 	var msg6: IRCMessage = IRCMessage.new("6", "linus_tt", Color.PERU, "Nobis non veritatis nihil incidunt magni saepe laudantium. Qui eos dolorum sunt itaque. Autem tenetur beatae tempora. Quo in est reprehenderit corporis molestias ad sint totam. Qui voluptas dolor harum. Aliquid tenetur modi deserunt delectus perferendis assumenda.")
 

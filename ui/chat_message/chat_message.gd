@@ -10,9 +10,8 @@ extends Container
 
 
 @onready var nick_label: Label = %NickLabel
-@onready var content_label: Label = %ContentLabel
+@onready var content_container: Container = %ContentContainer
 
-# * twitch emotes?
 
 func _ready() -> void:
 	_set_nick(nick)
@@ -58,7 +57,21 @@ func _set_nick_color(v: Color) -> void:
 func _set_content(v: String) -> void:
 	content = v
 
-	if not content_label or not v is String:
+	if not content_container or not v is String:
 		return
 
-	content_label.text = v
+	var parts: PackedStringArray = v.split(" ")
+	for part: String in parts:
+		if EmoteManager.is_emote(part):
+			var texture_rect: TextureRect = TextureRect.new()
+			content_container.add_child(texture_rect)
+			EmoteManager.get_emote_texture(
+				part,
+				func (texture: Texture2D) -> void:
+					texture_rect.texture = texture
+			)
+			continue
+
+		var label: Label = Label.new()
+		label.text = part
+		content_container.add_child(label)

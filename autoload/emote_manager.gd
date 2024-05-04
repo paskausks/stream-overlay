@@ -28,9 +28,8 @@ func _ready() -> void:
 	_get_emotes()
 
 
-
 func is_emote(emote_key_candidate: String) -> bool:
-	return emote_key_candidate in _emote_data
+	return _emote_data.has(emote_key_candidate)
 
 
 func get_emote_texture(emote_key: String, callback: Callable) -> void:
