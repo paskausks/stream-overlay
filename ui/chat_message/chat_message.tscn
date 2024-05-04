@@ -13,6 +13,7 @@ script = ExtResource("1_3kncx")
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 1
+horizontal_alignment = 2
 
 [node name="SeparatorLabel" type="Label" parent="."]
 layout_mode = 2

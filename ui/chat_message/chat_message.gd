@@ -12,7 +12,6 @@ extends Container
 @onready var nick_label: Label = %NickLabel
 @onready var content_label: Label = %ContentLabel
 
-# * fixed column size
 # * twitch emotes?
 
 func _ready() -> void:
@@ -23,6 +22,17 @@ func _ready() -> void:
 
 func destroy() -> void:
 	queue_free()
+
+
+func get_nick_width() -> float:
+	if not nick_label:
+		return 0
+
+	return nick_label.size.x
+
+
+func set_nick_width(width: float) -> void:
+	nick_label.custom_minimum_size.x = width
 
 
 func _set_nick(v: String) -> void:
