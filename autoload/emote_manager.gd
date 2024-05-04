@@ -3,14 +3,21 @@ extends Node
 const EMOTE_DATA_URL := "https://api.twitch.tv/helix/chat/emotes/global"
 const EMOTE_STORAGE := "user://emotes/"
 const EMOTE_1X_SIZE := 28
+
 const RES_KEY_DATA := "data"
 const RES_KEY_EMOTE_NAME := "name"
 const RES_KEY_IMAGES := "images"
-const RES_KEY_EMOTE_1X := "url_1x"
-const RES_KEY_EMOTE_2X := "url_2x"
-const RES_KEY_EMOTE_4X := "url_4x"
+const RES_KEY_EMOTE_ID := "id"
+const RES_KEY_FORMATS := "format"
+const RES_KEY_TEMPLATE := "template"
+
+const EMOTE_TEMPLATE_ID := "id"
+const EMOTE_TEMPLATE_FORMAT := "format"
+const EMOTE_TEMPLATE_THEME_MODE := "theme_mode"
+const EMOTE_TEMPLATE_SCALE := "scale"
 
 var _client_id: String
+var _emote_url_template: String
 
 var _request_container: Node # TODO(rp): node cleanup in container (max treshold?)
 
@@ -45,7 +52,7 @@ func get_emote_texture(emote_key: String, callback: Callable) -> void:
 
 	# TODO(rp): check EMOTE_STORAGE so emote doesn't have to be redownloaded
 
-	_request_emote(data.url_1x, callable)
+	_request_emote(_get_emote_url(data.id), callable)
 
 
 func _request_emote(url: String, response_handler: Callable) -> void:
@@ -81,16 +88,18 @@ func _on_emote_data_request_completed(_res: Error, _code: int, _headers: PackedS
 	var json := JSON.new()
 	json.parse(body.get_string_from_utf8())
 	var response: Dictionary = json.get_data()
+
+	_emote_url_template = response.get(RES_KEY_TEMPLATE)
+
 	for emote_entry: Dictionary in response[RES_KEY_DATA]:
 		var emote_name: String = emote_entry[RES_KEY_EMOTE_NAME]
-		var images: Dictionary = emote_entry[RES_KEY_IMAGES]
-		_emote_data[emote_name] = EmoteData.new(
+		var emote_data: EmoteData = EmoteData.new(
+			emote_entry.get(RES_KEY_EMOTE_ID) as String,
 			emote_name,
-			images.get(RES_KEY_EMOTE_1X) as String,
-			images.get(RES_KEY_EMOTE_2X) as String,
-			images.get(RES_KEY_EMOTE_4X) as String,
 		)
+		emote_data.is_animated = "animated" in emote_entry.get(RES_KEY_FORMATS)
 
+		_emote_data[emote_name] = emote_data
 
 func _get_texture_for(emote_key: String, body: PackedByteArray) -> Texture2D:
 	var path: String = EMOTE_STORAGE + emote_key + ".png"
@@ -106,18 +115,27 @@ func _get_texture_for(emote_key: String, body: PackedByteArray) -> Texture2D:
 	return texture
 
 
+## theme mode "default" - return animated emote url if that exists, otherwise static
+func _get_emote_url(id: String, format: String = "default", theme_mode: String = "dark", scale: float = 1.0) -> String:
+	var url: String = String(_emote_url_template)
+	var placeholder: String = "{{%s}}"
+	url = url.replace(placeholder % EMOTE_TEMPLATE_ID, id)
+	url = url.replace(placeholder % EMOTE_TEMPLATE_FORMAT, format)
+	url = url.replace(placeholder % EMOTE_TEMPLATE_THEME_MODE, theme_mode)
+	url = url.replace(placeholder % EMOTE_TEMPLATE_SCALE, str(scale))
+	return url
+
+
 class EmoteData:
+	var id: String
 	var name: String
-	var url_1x: String
-	var url_2x: String
-	var url_4x: String
+	var is_animated: bool
+
+	# cached data
 	var texture: Texture2D
+	var animated_texture: AnimatedTexture
 
-	func _init(pname: String, p1x: String, p2x: String, p4x: String) -> void:
+
+	func _init(pid: String, pname: String) -> void:
+		id = pid
 		name = pname
-		url_1x = p1x
-		url_2x = p2x
-		url_4x = p4x
-
-	func _to_string() -> String:
-		return "Emote: %s (url: %s)" % [name, url_1x]
