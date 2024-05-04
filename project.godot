@@ -17,6 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+CredentialManager="*res://autoload/credential_manager.gd"
+EmoteManager="*res://autoload/emote_manager.gd"
 ChatManager="*res://autoload/chat_manager.gd"
 
 [debug]
@@ -27,6 +29,10 @@ gdscript/warnings/unsafe_method_access=1
 gdscript/warnings/unsafe_cast=1
 gdscript/warnings/unsafe_call_argument=1
 gdscript/warnings/static_called_on_instance=0
+
+[editor]
+
+run/main_run_args="--test"
 
 [editor_plugins]
 

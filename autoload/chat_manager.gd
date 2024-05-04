@@ -4,11 +4,10 @@ signal chat_messaged(message: IRCMessage)
 
 const TWITCH_IRC_ADDRESS = "wss://irc-ws.chat.twitch.tv"
 const NICK := "rpwtf"
-const CHANNEL := "#hutchmf" # e.g. "#theo"
+const CHANNEL := "#shroud" # e.g. "#theo"
 const TEST_ARG := "--test"
 
 var _client: WebSocketPeer = WebSocketPeer.new()
-var _token: String
 var _auth_sent: bool = false
 static var _status_message_pattern: RegEx = RegEx.create_from_string(r"^:.*\s(\d{3}).+:(.*)$")
 
@@ -60,10 +59,7 @@ func _ready() -> void:
 		return
 
 	_client.connect_to_url(TWITCH_IRC_ADDRESS)
-
-	var token_file: FileAccess = FileAccess.open("res://access_token", FileAccess.READ)
-	_token = token_file.get_line().strip_edges()
-	token_file.close()
+	_get_global_emotes()
 
 
 func _process(_delta: float) -> void:
@@ -102,7 +98,7 @@ func _process_line(line: String) -> void:
 func _send_auth() -> void:
 	_auth_sent = true
 	_client.send_text("CAP REQ :twitch.tv/membership twitch.tv/tags twitch.tv/commands")
-	_client.send_text("PASS oauth:%s" % _token)
+	_client.send_text("PASS oauth:%s" % CredentialManager.get_token())
 	_client.send_text("NICK %s" % NICK)
 	_client.send_text("JOIN %s" % CHANNEL)
 
@@ -114,11 +110,11 @@ func _log(message: String) -> void:
 func _integration_test() -> void:
 	var delay: float = 0.5
 
-	var msg1: IRCMessage = IRCMessage.new("1", "manlypink", Color.RED, "hello world!")
+	var msg1: IRCMessage = IRCMessage.new("1", "manlypink", Color.RED, "hello world! Kappa")
 	var msg2: IRCMessage = IRCMessage.new("2", "nat", Color.GRAY, "BabyRage")
 	var msg3: IRCMessage = IRCMessage.new("3", "vito", Color.GREEN, "this is my favorite stream, LUL ig")
-	var msg4: IRCMessage = IRCMessage.new("4", "duck", Color.GOLD, "C++ is the GOAT")
-	var msg5: IRCMessage = IRCMessage.new("5", "linus_torwalds", Color.LIME, "Nihil exercitationem est vero placeat fugit laborum. Animi autem amet aut laborum molestiae ut. Consequatur deleniti voluptatem et inventore eligendi laboriosam molestias sed. Consectetur ab aut velit blanditiis. Neque enim architecto et eaque esse labore earum.")
+	var msg4: IRCMessage = IRCMessage.new("4", "duck", Color.GOLD, "C++ is the GOAT CoolCap")
+	var msg5: IRCMessage = IRCMessage.new("5", "linus_torwalds", Color.LIME, "Nihil exercitationem est vero placeat fugit laborum. Animi autem amet aut laborum molestiae ut. PogChamp Consequatur deleniti voluptatem et inventore eligendi laboriosam molestias sed. Consectetur ab aut velit blanditiis. Neque enim architecto et eaque esse labore earum.")
 	var msg6: IRCMessage = IRCMessage.new("6", "linus_tt", Color.PERU, "Nobis non veritatis nihil incidunt magni saepe laudantium. Qui eos dolorum sunt itaque. Autem tenetur beatae tempora. Quo in est reprehenderit corporis molestias ad sint totam. Qui voluptas dolor harum. Aliquid tenetur modi deserunt delectus perferendis assumenda.")
 
 	var messages: Array[IRCMessage] = [
