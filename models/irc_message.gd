@@ -3,12 +3,12 @@ extends IRCMessageBase
 
 var id: String
 var nick: String
-var color: Color
-var message: String
+var nick_color: Color
+var content: String
 
 
-func _init(_id: String, _nick: String, _color: Color, _message: String) -> void:
+func _init(_id: String, _nick: String, _nick_color: Color, _content: String) -> void:
 	id = _id
 	nick = _nick
-	color = _color
-	message = _message
+	nick_color = _nick_color
+	content = _content

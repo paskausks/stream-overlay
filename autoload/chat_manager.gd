@@ -4,7 +4,8 @@ signal chat_messaged(message: IRCMessage)
 
 const TWITCH_IRC_ADDRESS = "wss://irc-ws.chat.twitch.tv"
 const NICK := "rpwtf"
-const CHANNEL := "#twitch" # e.g. "#theo"
+const CHANNEL := "#hutchmf" # e.g. "#theo"
+const TEST_ARG := "--test"
 
 var _client: WebSocketPeer = WebSocketPeer.new()
 var _token: String
@@ -53,6 +54,11 @@ static func parse_capabilities(capabilities_block: String) -> Dictionary:
 
 
 func _ready() -> void:
+	if TEST_ARG in OS.get_cmdline_args():
+		_integration_test()
+		set_process(false)
+		return
+
 	_client.connect_to_url(TWITCH_IRC_ADDRESS)
 
 	var token_file: FileAccess = FileAccess.open("res://access_token", FileAccess.READ)
@@ -89,7 +95,7 @@ func _process_line(line: String) -> void:
 
 	if msg is IRCMessage:
 		var chat_msg := msg as IRCMessage
-		_log("%s: %s" % [chat_msg.nick, chat_msg.message])
+		_log("%s: %s" % [chat_msg.nick, chat_msg.content])
 		chat_messaged.emit(chat_msg)
 
 
@@ -103,3 +109,27 @@ func _send_auth() -> void:
 
 func _log(message: String) -> void:
 	prints("[", Time.get_datetime_string_from_system() ,"] ", message)
+
+
+func _integration_test() -> void:
+	var delay: float = 0.5
+
+	var msg1: IRCMessage = IRCMessage.new("1", "manlypink", Color.RED, "hello world!")
+	var msg2: IRCMessage = IRCMessage.new("2", "nat", Color.GRAY, "BabyRage")
+	var msg3: IRCMessage = IRCMessage.new("3", "vito", Color.GREEN, "this is my favorite stream, LUL ig")
+	var msg4: IRCMessage = IRCMessage.new("4", "duck", Color.GOLD, "C++ is the GOAT")
+	var msg5: IRCMessage = IRCMessage.new("5", "linus_torwalds", Color.LIME, "Nihil exercitationem est vero placeat fugit laborum. Animi autem amet aut laborum molestiae ut. Consequatur deleniti voluptatem et inventore eligendi laboriosam molestias sed. Consectetur ab aut velit blanditiis. Neque enim architecto et eaque esse labore earum.")
+	var msg6: IRCMessage = IRCMessage.new("6", "linus_tt", Color.PERU, "Nobis non veritatis nihil incidunt magni saepe laudantium. Qui eos dolorum sunt itaque. Autem tenetur beatae tempora. Quo in est reprehenderit corporis molestias ad sint totam. Qui voluptas dolor harum. Aliquid tenetur modi deserunt delectus perferendis assumenda.")
+
+	var messages: Array[IRCMessage] = [
+		msg1,
+		msg2,
+		msg5,
+		msg3,
+		msg4,
+		msg6,
+	]
+
+	for message: IRCMessage in messages:
+		create_tween().tween_callback(func () -> void: chat_messaged.emit(message)).set_delay(delay)
+		delay += 0.5

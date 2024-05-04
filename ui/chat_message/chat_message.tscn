@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://d1fdcxrjpxq7k"]
+
+[ext_resource type="Script" path="res://ui/chat_message/chat_message.gd" id="1_3kncx"]
+
+[node name="ChatMessage" type="HBoxContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+script = ExtResource("1_3kncx")
+
+[node name="NickLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 1
+
+[node name="SeparatorLabel" type="Label" parent="."]
+layout_mode = 2
+size_flags_vertical = 1
+text = ":"
+
+[node name="ContentLabel" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
