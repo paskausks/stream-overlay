@@ -4,8 +4,10 @@ signal chat_messaged(message: IRCMessage)
 
 const TWITCH_IRC_ADDRESS = "wss://irc-ws.chat.twitch.tv"
 const NICK := "rpwtf"
-const CHANNEL := "#shroud" # e.g. "#theo"
+const CHANNEL := "#rpwtf" # e.g. "#theo"
 const TEST_ARG := "--test"
+
+# TODO(rp): SEND PONG TO THE PING
 
 var _client: WebSocketPeer = WebSocketPeer.new()
 var _auth_sent: bool = false
@@ -59,6 +61,17 @@ func _ready() -> void:
 		return
 
 	_client.connect_to_url(TWITCH_IRC_ADDRESS)
+
+
+func send_privmsg(text: String) -> void:
+	if not _client:
+		return
+
+	if _client.get_ready_state() != WebSocketPeer.STATE_OPEN:
+		_log("Can't send message \"%s\", not connected!" % text)
+		return
+
+	_client.send_text("PRIVMSG %s :%s" % [CHANNEL, text])
 
 
 func _process(_delta: float) -> void:

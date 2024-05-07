@@ -101,6 +101,7 @@ func _on_emote_data_request_completed(_res: Error, _code: int, _headers: PackedS
 
 		_emote_data[emote_name] = emote_data
 
+
 func _get_texture_for(emote_key: String, body: PackedByteArray) -> Texture2D:
 	var path: String = EMOTE_STORAGE + emote_key + ".png"
 	if not FileAccess.file_exists(path):
@@ -115,8 +116,9 @@ func _get_texture_for(emote_key: String, body: PackedByteArray) -> Texture2D:
 	return texture
 
 
-## theme mode "default" - return animated emote url if that exists, otherwise static
-func _get_emote_url(id: String, format: String = "default", theme_mode: String = "dark", scale: float = 1.0) -> String:
+## theme mode "default" - return animated emote url if that exists, otherwise
+## can be "static" or "animated".
+func _get_emote_url(id: String, format: String = "static", theme_mode: String = "dark", scale: float = 1.0) -> String:
 	var url: String = String(_emote_url_template)
 	var placeholder: String = "{{%s}}"
 	url = url.replace(placeholder % EMOTE_TEMPLATE_ID, id)
