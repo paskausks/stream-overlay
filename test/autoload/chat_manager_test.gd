@@ -51,7 +51,7 @@ func test_parse_privmsg1() -> void:
 	var expected: IRCMessage = IRCMessage.new(
 		"357da145-6b71-4e8f-8eed-f1d4a73abbf6",
 		"catsarethebest48",
-		"",
+		Color.WHITE,
 		"my dogs are in shambles #GoCatsGo"
 	)
 
@@ -64,8 +64,14 @@ func test_parse_privmsg2() -> void:
 	var expected: IRCMessage = IRCMessage.new(
 		"12f77484-a576-4435-a32f-fb57e08e393f",
 		"DirtySouth2008",
-		"#0000FF",
+		Color.html("#0000FF"),
 		"mbushCool mbushCool"
 	)
 
 	assert_object(ChatManager.parse_privmsg(input)).is_equal(expected)
+
+
+func test_parse_pingmessage_from_parse_line() -> void:
+	var input: String = "PING :tmi.twitch.tv"
+	var expected: IRCPingMessage = IRCPingMessage.new(" :tmi.twitch.tv")
+	assert_object(ChatManager.parse_line(input)).is_equal(expected)

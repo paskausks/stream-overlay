@@ -7,8 +7,6 @@ const NICK := "rpwtf"
 const CHANNEL := "#rpwtf" # e.g. "#theo"
 const TEST_ARG := "--test"
 
-# TODO(rp): SEND PONG TO THE PING
-
 var _client: WebSocketPeer = WebSocketPeer.new()
 var _auth_sent: bool = false
 static var _status_message_pattern: RegEx = RegEx.create_from_string(r"^:.*\s(\d{3}).+:(.*)$")
@@ -25,6 +23,9 @@ static func parse_line(line: String) -> IRCMessageBase:
 
 	if "PRIVMSG %s" % CHANNEL in line:
 		return parse_privmsg(line)
+
+	if line.to_lower().substr(0, 4) == "ping":
+		return IRCPingMessage.new(line.substr(4))
 
 	return IRCMessageBase.new()
 
@@ -105,6 +106,10 @@ func _process_line(line: String) -> void:
 		var chat_msg := msg as IRCMessage
 		_log("%s: %s" % [chat_msg.nick, chat_msg.content])
 		chat_messaged.emit(chat_msg)
+
+	if msg is IRCPingMessage:
+		_log("Got PINGed by Twitch. PONGing back.")
+		_client.send_text("PONG %s" % (msg as IRCPingMessage).content)
 
 
 func _send_auth() -> void:
