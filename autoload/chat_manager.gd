@@ -3,9 +3,8 @@ extends Node
 signal chat_messaged(message: IRCMessage)
 
 const TWITCH_IRC_ADDRESS = "wss://irc-ws.chat.twitch.tv"
-const NICK := "rpwtf"
-const CHANNEL := "#rpwtf" # e.g. "#theo"
-const TEST_ARG := "--test"
+const NICK := "rpWTF"
+const CHANNEL := "#rpwtf" # e.g. "#rpwtf"
 
 var _client: WebSocketPeer = WebSocketPeer.new()
 var _auth_sent: bool = false
@@ -56,7 +55,7 @@ static func parse_capabilities(capabilities_block: String) -> Dictionary:
 
 
 func _ready() -> void:
-	if TEST_ARG in OS.get_cmdline_args():
+	if Constants.TEST_ARG in OS.get_cmdline_args():
 		_integration_test()
 		set_process(false)
 		return
@@ -68,9 +67,19 @@ func send_privmsg(text: String) -> void:
 	if not _client:
 		return
 
+	var chat_msg: IRCMessage = IRCMessage.new(
+		str(Time.get_unix_time_from_system()),
+		NICK,
+		Color.WHITE,
+		text,
+	)
+
 	if _client.get_ready_state() != WebSocketPeer.STATE_OPEN:
 		_log("Can't send message \"%s\", not connected!" % text)
+		chat_messaged.emit(chat_msg)
 		return
+
+	chat_messaged.emit(chat_msg)
 
 	_client.send_text("PRIVMSG %s :%s" % [CHANNEL, text])
 
