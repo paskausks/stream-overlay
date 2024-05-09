@@ -24,12 +24,13 @@ var _request_container: Node # TODO(rp): node cleanup in container (max treshold
 ## String -> EmoteData
 var _emote_data: Dictionary = {}
 
+# TODO(rp): ANIMATED GIFS: https://github.com/BOTLANNER/godot-gif
 
 func _ready() -> void:
 	if not DirAccess.dir_exists_absolute(EMOTE_STORAGE):
 		DirAccess.make_dir_absolute(EMOTE_STORAGE)
 
-	_client_id = CredentialManager.get_client_id()
+	_client_id = ConfigurationManager.client_id
 	_request_container = Node.new()
 	add_child(_request_container)
 	_get_emotes()
@@ -67,8 +68,8 @@ func _get_emotes() -> void:
 	var _http_request := _get_http_request()
 
 	var headers: PackedStringArray = [
-		"Authorization: Bearer %s" % CredentialManager.get_token(),
-		"Client-Id: %s" % CredentialManager.get_client_id(),
+		"Authorization: Bearer %s" % ConfigurationManager.access_token,
+		"Client-Id: %s" % _client_id,
 	]
 
 	_http_request.request_completed.connect(_on_emote_data_request_completed, CONNECT_ONE_SHOT)

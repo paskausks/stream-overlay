@@ -12,13 +12,15 @@ config_version=5
 
 config/name="Chatbot"
 run/main_scene="res://main.tscn"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="rpchatbot"
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 Constants="*res://autoload/constants.gd"
-CredentialManager="*res://autoload/credential_manager.gd"
+ConfigurationManager="*res://autoload/configuration_manager.gd"
 EmoteManager="*res://autoload/emote_manager.gd"
 ChatManager="*res://autoload/chat_manager.gd"
 CommandManager="*res://autoload/command_manager.gd"

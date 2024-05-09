@@ -124,7 +124,7 @@ func _process_line(line: String) -> void:
 func _send_auth() -> void:
 	_auth_sent = true
 	_client.send_text("CAP REQ :twitch.tv/membership twitch.tv/tags twitch.tv/commands")
-	_client.send_text("PASS oauth:%s" % CredentialManager.get_token())
+	_client.send_text("PASS oauth:%s" % ConfigurationManager.access_token)
 	_client.send_text("NICK %s" % NICK)
 	_client.send_text("JOIN %s" % CHANNEL)
 

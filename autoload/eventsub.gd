@@ -62,8 +62,8 @@ func _subscribe(json_string: String) -> void:
 
 	var headers: PackedStringArray = [
 		# requires the "moderator:read:followers" scope
-		"Authorization: Bearer %s" % CredentialManager.get_token(),
-		"Client-Id: %s" % CredentialManager.get_client_id(),
+		"Authorization: Bearer %s" % ConfigurationManager.access_token,
+		"Client-Id: %s" % ConfigurationManager.client_id,
 		"Content-Type: application/json"
 	]
 
