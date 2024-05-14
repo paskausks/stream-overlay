@@ -26,6 +26,18 @@ github,https://github.com/paskausks
 
 `{{user}}` will be replaced with the user name.
 
+### General configuration
+
+Create a file "config.ini" in the configuration directory with the following contents:
+
+```ini
+[main]
+nickname="rpWTF" # capitalization does not matter
+channel="rpwtf"
+```
+
+Where `nick` is your twitch.tv nickname and `channel` is the target channel for the chatbot/chat overlay.
+
 ### Authentication data
 
 Acquire an OAuth user access token following the steps outlined [here](https://dev.twitch.tv/docs/irc/authenticate-bot/) (make sure to include the "moderator:read:followers" scope as required by the `channel.follow` [event](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelfollow)).

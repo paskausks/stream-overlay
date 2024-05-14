@@ -3,11 +3,11 @@ extends Node
 signal chat_messaged(message: IRCMessage)
 
 const TWITCH_IRC_ADDRESS = "wss://irc-ws.chat.twitch.tv"
-const NICK := "rpWTF"
-const CHANNEL := "#rpwtf" # e.g. "#rpwtf"
 
 var _client: WebSocketPeer = WebSocketPeer.new()
 var _auth_sent: bool = false
+var _nickname: String = ""
+var _channel: String = ""
 static var _status_message_pattern: RegEx = RegEx.create_from_string(r"^:.*\s(\d{3}).+:(.*)$")
 
 
@@ -20,7 +20,7 @@ static func parse_line(line: String) -> IRCMessageBase:
 			groups[2],
 		)
 
-	if "PRIVMSG %s" % CHANNEL in line:
+	if "PRIVMSG %s" % ConfigurationManager.channel in line:
 		return parse_privmsg(line)
 
 	if line.to_lower().substr(0, 4) == "ping":
@@ -60,6 +60,8 @@ func _ready() -> void:
 		set_process(false)
 		return
 
+	_nickname = ConfigurationManager.nickname
+	_channel = ConfigurationManager.channel
 	_client.connect_to_url(TWITCH_IRC_ADDRESS)
 
 
@@ -69,7 +71,7 @@ func send_privmsg(text: String) -> void:
 
 	var chat_msg: IRCMessage = IRCMessage.new(
 		str(Time.get_unix_time_from_system()),
-		NICK,
+		_nickname,
 		Color.WHITE,
 		text,
 	)
@@ -81,7 +83,7 @@ func send_privmsg(text: String) -> void:
 
 	chat_messaged.emit(chat_msg)
 
-	_client.send_text("PRIVMSG %s :%s" % [CHANNEL, text])
+	_client.send_text("PRIVMSG %s :%s" % [_channel, text])
 
 
 func _process(_delta: float) -> void:
@@ -125,8 +127,8 @@ func _send_auth() -> void:
 	_auth_sent = true
 	_client.send_text("CAP REQ :twitch.tv/membership twitch.tv/tags twitch.tv/commands")
 	_client.send_text("PASS oauth:%s" % ConfigurationManager.access_token)
-	_client.send_text("NICK %s" % NICK)
-	_client.send_text("JOIN %s" % CHANNEL)
+	_client.send_text("NICK %s" % _nickname)
+	_client.send_text("JOIN %s" % _channel)
 
 
 func _log(message: String) -> void:
