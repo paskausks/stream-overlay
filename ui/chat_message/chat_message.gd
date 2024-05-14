@@ -14,10 +14,6 @@ const FONT_SIZE: int = 18
 	set = _set_content
 
 
-# TODO(rp): turn black nicknames into another color or invert outline
-# maybe check the luminosity of the color
-
-
 @onready var nick_label: Label = %NickLabel
 @onready var content_container: Container = %ContentContainer
 

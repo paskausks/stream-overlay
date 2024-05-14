@@ -42,7 +42,7 @@ func _on_chat_messaged(irc_message: IRCMessage) -> void:
 		# probably not a command
 		return
 
-	if irc_message.nick == ChatManager.NICK:
+	if irc_message.nick == ConfigurationManager.nickname:
 		# ignore own messages
 		return
 

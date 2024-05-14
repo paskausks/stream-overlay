@@ -8,7 +8,7 @@ const KEY_CLIENT_ID: String = "client_id"
 const KEY_ACCESS_TOKEN: String = "access_token"
 const PATH_CONFIG_FILE = "user://config.ini"
 const CONFIG_SECTION_MAIN = "main"
-const KEY_NICKNAME = "nick"
+const KEY_NICKNAME = "nickname"
 const KEY_CHANNEL = "channel"
 
 var _access_config: ConfigFile
@@ -24,7 +24,7 @@ var nickname: String:
 	get: return _main_config.get_value(CONFIG_SECTION_MAIN, KEY_NICKNAME, "")
 
 var channel: String:
-	get: return _main_config.get_value(CONFIG_SECTION_MAIN, KEY_CHANNEL, "")
+	get: return "#%s" % _main_config.get_value(CONFIG_SECTION_MAIN, KEY_CHANNEL, "")
 
 
 func _ready() -> void:
