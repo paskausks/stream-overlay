@@ -1,6 +1,6 @@
 # Godot Overlay
 
-A chatbot/chatbox/stream overlay running in the Godot engine.
+A chatbot/stream overlay running in the Godot engine.
 
 Coded live at [twitch.tv/rpwtf](https://twitch.tv/rpwtf)!
 

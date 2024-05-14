@@ -7,6 +7,8 @@ const MAX_MESSAGES: int = 5
 
 
 func _ready() -> void:
+	if OS.is_debug_build():
+		color = Color.BLACK
 	ChatManager.chat_messaged.connect(_on_chat_messaged)
 
 

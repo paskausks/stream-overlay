@@ -49,7 +49,7 @@ func _set_nick_color(v: Color) -> void:
 	if not nick_label:
 		return
 
-	var label_settings: LabelSettings = LabelSettings.new()
+	var label_settings: LabelSettings = _create_label_settings()
 	label_settings.font_color = v if v != Color.GREEN else Color.WHITE
 	nick_label.label_settings = label_settings
 
@@ -74,4 +74,14 @@ func _set_content(v: String) -> void:
 
 		var label: Label = Label.new()
 		label.text = part
+		label.label_settings = _create_label_settings()
 		content_container.add_child(label)
+
+
+func _create_label_settings() -> LabelSettings:
+	var label_settings: LabelSettings = LabelSettings.new()
+	label_settings.font_size = 18
+	label_settings.outline_size = 5
+	label_settings.outline_color = Color.BLACK
+
+	return label_settings
