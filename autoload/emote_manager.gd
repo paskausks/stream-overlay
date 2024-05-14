@@ -37,22 +37,25 @@ func _ready() -> void:
 
 
 func is_emote(emote_key_candidate: String) -> bool:
-	return _emote_data.has(emote_key_candidate)
+	return _emote_data.has(_get_normalized_emote_key(emote_key_candidate))
 
 
 func get_emote_texture(emote_key: String, texture_callback: Callable) -> void:
-	if emote_key not in _emote_data:
+	var normalized_key: String = _get_normalized_emote_key(emote_key)
+
+	if normalized_key not in _emote_data:
 		return
 
-	var data: EmoteData = _emote_data.get(emote_key) as EmoteData
+	var data: EmoteData = _emote_data.get(normalized_key) as EmoteData
 	if data.texture is Texture2D:
 		return texture_callback.call(data.texture)
 
 	var request_callback: Callable = func (_r: Error, _c: int, _h: PackedStringArray, body: PackedByteArray) -> void:
-		texture_callback.call(_get_texture_for(emote_key, body))
+		texture_callback.call(_get_texture_for(normalized_key, body))
 
-	var path: String = _get_emote_cache_path(emote_key)
+	var path: String = _get_emote_cache_path(normalized_key)
 	if FileAccess.file_exists(path):
+		prints("[", Time.get_datetime_string_from_system() ,"] file cache", normalized_key)
 		var image: Image = Image.load_from_file(path)
 		texture_callback.call(ImageTexture.create_from_image(image))
 	else:
@@ -103,7 +106,7 @@ func _on_emote_data_request_completed(_res: Error, _code: int, _headers: PackedS
 		)
 		emote_data.is_animated = "animated" in emote_entry.get(RES_KEY_FORMATS)
 
-		_emote_data[emote_name] = emote_data
+		_emote_data[_get_normalized_emote_key(emote_name)] = emote_data
 
 
 func _get_texture_for(emote_key: String, body: PackedByteArray) -> Texture2D:
@@ -135,6 +138,10 @@ func _get_emote_url(id: String, format: String = "static", theme_mode: String = 
 ## emote_key - emote name e.g. Kappa
 func _get_emote_cache_path(emote_key: String) -> String:
 	return EMOTE_STORAGE + emote_key + ".png"
+
+
+func _get_normalized_emote_key(emote_key: String) -> String:
+	return emote_key.md5_text()
 
 
 class EmoteData:
