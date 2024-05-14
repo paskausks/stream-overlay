@@ -25,6 +25,7 @@ EmoteManager="*res://autoload/emote_manager.gd"
 ChatManager="*res://autoload/chat_manager.gd"
 CommandManager="*res://autoload/command_manager.gd"
 EventSub="*res://autoload/eventsub.gd"
+TokenServer="*res://autoload/token_server.gd"
 
 [debug]
 
