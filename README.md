@@ -1,6 +1,6 @@
-# Godot Chatbox
+# Godot Overlay
 
-A chatbot/chatbox running in the Godot engine.
+A chatbot/chatbox/stream overlay running in the Godot engine.
 
 Coded live at [twitch.tv/rpwtf](https://twitch.tv/rpwtf)!
 
@@ -12,8 +12,8 @@ Godot 4.2
 
 Create a folder for the configuration files:
 
-* Linux: ~/.local/share/rpchatbot
-* Windows %APPDATA%\rpchatbot
+* Linux: ~/.local/share/rpoverlay
+* Windows %APPDATA%\rpoverlay
 
 ### Custom commands
 

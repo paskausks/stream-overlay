@@ -10,12 +10,12 @@ config_version=5
 
 [application]
 
-config/name="Chatbot"
+config/name="RPOverlay"
 run/main_scene="res://main.tscn"
 config/use_custom_user_dir=true
-config/custom_user_dir_name="rpchatbot"
+config/custom_user_dir_name="rpoverlay"
 config/features=PackedStringArray("4.2", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://icon.png"
 
 [autoload]
 
@@ -34,6 +34,12 @@ gdscript/warnings/unsafe_method_access=1
 gdscript/warnings/unsafe_cast=1
 gdscript/warnings/unsafe_call_argument=1
 gdscript/warnings/static_called_on_instance=0
+
+[display]
+
+window/size/viewport_width=466
+window/size/viewport_height=818
+window/size/resizable=false
 
 [editor]
 
