@@ -37,7 +37,7 @@ gdscript/warnings/static_called_on_instance=0
 
 [display]
 
-window/size/viewport_width=466
+window/size/viewport_width=500
 window/size/viewport_height=818
 window/size/resizable=false
 
