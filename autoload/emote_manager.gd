@@ -55,7 +55,6 @@ func get_emote_texture(emote_key: String, texture_callback: Callable) -> void:
 
 	var path: String = _get_emote_cache_path(normalized_key)
 	if FileAccess.file_exists(path):
-		prints("[", Time.get_datetime_string_from_system() ,"] file cache", normalized_key)
 		var image: Image = Image.load_from_file(path)
 		texture_callback.call(ImageTexture.create_from_image(image))
 	else:
