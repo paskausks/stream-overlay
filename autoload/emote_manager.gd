@@ -125,7 +125,7 @@ func _get_emote_url(id: String, format: String = "static", theme_mode: String = 
 	url = url.replace(placeholder % EMOTE_TEMPLATE_ID, id)
 	url = url.replace(placeholder % EMOTE_TEMPLATE_FORMAT, format)
 	url = url.replace(placeholder % EMOTE_TEMPLATE_THEME_MODE, theme_mode)
-	url = url.replace(placeholder % EMOTE_TEMPLATE_SCALE, str(scale))
+	url = url.replace(placeholder % EMOTE_TEMPLATE_SCALE, "%2.1f" % scale) # otherwise 1.0 -> "1"
 	return url
 
 
