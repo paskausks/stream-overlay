@@ -40,20 +40,23 @@ func is_emote(emote_key_candidate: String) -> bool:
 	return _emote_data.has(emote_key_candidate)
 
 
-func get_emote_texture(emote_key: String, callback: Callable) -> void:
+func get_emote_texture(emote_key: String, texture_callback: Callable) -> void:
 	if emote_key not in _emote_data:
 		return
 
 	var data: EmoteData = _emote_data.get(emote_key) as EmoteData
 	if data.texture is Texture2D:
-		return callback.call(data.texture)
+		return texture_callback.call(data.texture)
 
-	var callable: Callable = func (_r: Error, _c: int, _h: PackedStringArray, body: PackedByteArray) -> void:
-		callback.call(_get_texture_for(emote_key, body))
+	var request_callback: Callable = func (_r: Error, _c: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+		texture_callback.call(_get_texture_for(emote_key, body))
 
-	# TODO(rp): check EMOTE_STORAGE so emote doesn't have to be redownloaded
-
-	_request_emote(_get_emote_url(data.id), callable)
+	var path: String = _get_emote_cache_path(emote_key)
+	if FileAccess.file_exists(path):
+		var image: Image = Image.load_from_file(path)
+		texture_callback.call(ImageTexture.create_from_image(image))
+	else:
+		_request_emote(_get_emote_url(data.id), request_callback)
 
 
 func _request_emote(url: String, response_handler: Callable) -> void:
@@ -104,7 +107,7 @@ func _on_emote_data_request_completed(_res: Error, _code: int, _headers: PackedS
 
 
 func _get_texture_for(emote_key: String, body: PackedByteArray) -> Texture2D:
-	var path: String = EMOTE_STORAGE + emote_key + ".png"
+	var path: String = _get_emote_cache_path(emote_key)
 	if not FileAccess.file_exists(path):
 		var image_file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
 		image_file.store_buffer(body)
@@ -127,6 +130,11 @@ func _get_emote_url(id: String, format: String = "static", theme_mode: String = 
 	url = url.replace(placeholder % EMOTE_TEMPLATE_THEME_MODE, theme_mode)
 	url = url.replace(placeholder % EMOTE_TEMPLATE_SCALE, "%2.1f" % scale) # otherwise 1.0 -> "1"
 	return url
+
+
+## emote_key - emote name e.g. Kappa
+func _get_emote_cache_path(emote_key: String) -> String:
+	return EMOTE_STORAGE + emote_key + ".png"
 
 
 class EmoteData:
