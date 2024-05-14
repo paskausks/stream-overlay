@@ -1,12 +1,21 @@
 class_name ChatMessage
 extends Container
 
+const NICKNAME_LUMINANCE_THRESHOLD: float = 0.33
+const OUTLINE_COLOR: Color = Color.BLACK
+const OUTLINE_SIZE: int = 5
+const FONT_SIZE: int = 18
+
 @export var nick: String:
 	set = _set_nick
 @export var nick_color: Color = Color.WHITE:
 	set = _set_nick_color
 @export var content: String:
 	set = _set_content
+
+
+# TODO(rp): turn black nicknames into another color or invert outline
+# maybe check the luminosity of the color
 
 
 @onready var nick_label: Label = %NickLabel
@@ -50,7 +59,7 @@ func _set_nick_color(v: Color) -> void:
 		return
 
 	var label_settings: LabelSettings = _create_label_settings()
-	label_settings.font_color = v if v != Color.GREEN else Color.WHITE
+	label_settings.font_color = _get_fallback_color(v)
 	nick_label.label_settings = label_settings
 
 
@@ -80,8 +89,19 @@ func _set_content(v: String) -> void:
 
 func _create_label_settings() -> LabelSettings:
 	var label_settings: LabelSettings = LabelSettings.new()
-	label_settings.font_size = 18
-	label_settings.outline_size = 5
-	label_settings.outline_color = Color.BLACK
+	label_settings.font_size = FONT_SIZE
+	label_settings.outline_size = OUTLINE_SIZE
+	label_settings.outline_color = OUTLINE_COLOR
 
 	return label_settings
+
+
+func _get_fallback_color(color: Color) -> Color:
+	if color == Color.GREEN:
+		# avoid nick being chrome keyed
+		return Color.WHITE
+
+	if color.get_luminance() < NICKNAME_LUMINANCE_THRESHOLD:
+		return Color.WHITE
+
+	return color
