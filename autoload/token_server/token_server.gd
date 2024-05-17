@@ -45,15 +45,23 @@ func _listen_for_connections() -> void:
 		if not _server.is_connection_available():
 			continue
 
-		call_deferred("_handle_request")
+		call_deferred("_create_request_thread")
 
 
-func _handle_request() -> void:
+func _create_request_thread() -> void:
+	if not _server.is_listening():
+		return
+
 	var connection: StreamPeerTCP = _server.take_connection()
 
 	if not connection:
 		return
 
+	var thread: Thread = Thread.new()
+	thread.start(_handle_request.bind(connection))
+
+
+func _handle_request(connection: StreamPeerTCP) -> void:
 	if connection.get_status() != StreamPeerTCP.STATUS_CONNECTED:
 		return
 
@@ -63,13 +71,13 @@ func _handle_request() -> void:
 		return
 
 	if _is_token_post(body):
-		_store_token(body)
+		call_deferred("_store_token", body)
 		_respond(connection)
 		return
 
 	if _is_success_request(body):
 		_respond(connection, _get_template(SUCCESS_TEMPLATE_PATH))
-		_server.stop()
+		_stop_server()
 		return
 
 	_respond(connection, _get_template(TOKEN_RECEIVE_TEMPLATE_PATH))
@@ -130,6 +138,10 @@ func _format_oauth_url() -> String:
 		LISTEN_PORT,
 		"+".join(scope_list)
 	]
+
+
+func _stop_server() -> void:
+	_server.stop()
 
 
 func _exit_tree() -> void:
