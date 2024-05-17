@@ -2,9 +2,8 @@ class_name ChatMessage
 extends Container
 
 const NICKNAME_LUMINANCE_THRESHOLD: float = 0.33
-const OUTLINE_COLOR: Color = Color.BLACK
-const OUTLINE_SIZE: int = 5
-const FONT_SIZE: int = 18
+const ChatMessageFragmentScene: PackedScene = preload("res://ui/chat_message_fragment.tscn")
+const ChatMessageLabelSettings: Resource = preload("res://ui/chat_message_label_settings.tres")
 
 @export var nick: String:
 	set = _set_nick
@@ -12,7 +11,6 @@ const FONT_SIZE: int = 18
 	set = _set_nick_color
 @export var content: String:
 	set = _set_content
-
 
 @onready var nick_label: Label = %NickLabel
 @onready var content_container: Container = %ContentContainer
@@ -54,7 +52,7 @@ func _set_nick_color(v: Color) -> void:
 	if not nick_label:
 		return
 
-	var label_settings: LabelSettings = _create_label_settings()
+	var label_settings: LabelSettings = ChatMessageLabelSettings.duplicate()
 	label_settings.font_color = _get_fallback_color(v)
 	nick_label.label_settings = label_settings
 
@@ -77,19 +75,9 @@ func _set_content(v: String) -> void:
 			)
 			continue
 
-		var label: Label = Label.new()
+		var label: Label = ChatMessageFragmentScene.instantiate()
 		label.text = part
-		label.label_settings = _create_label_settings()
 		content_container.add_child(label)
-
-
-func _create_label_settings() -> LabelSettings:
-	var label_settings: LabelSettings = LabelSettings.new()
-	label_settings.font_size = FONT_SIZE
-	label_settings.outline_size = OUTLINE_SIZE
-	label_settings.outline_color = OUTLINE_COLOR
-
-	return label_settings
 
 
 func _get_fallback_color(color: Color) -> Color:

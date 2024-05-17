@@ -2,25 +2,28 @@
 
 [ext_resource type="Script" path="res://ui/chat_message/chat_message.gd" id="1_3kncx"]
 
-[node name="ChatMessage" type="HBoxContainer"]
+[node name="ChatMessage" type="VBoxContainer"]
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 23.0
 grow_horizontal = 2
 script = ExtResource("1_3kncx")
 
-[node name="NickLabel" type="Label" parent="."]
+[node name="MarginContainer2" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_bottom = 8
+
+[node name="NickLabel" type="Label" parent="MarginContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 0
 size_flags_vertical = 1
-horizontal_alignment = 2
 
-[node name="SeparatorLabel" type="Label" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
-size_flags_vertical = 1
-text = ":"
+theme_override_constants/margin_bottom = 16
 
-[node name="ContentContainer" type="HFlowContainer" parent="."]
+[node name="ContentContainer" type="HFlowContainer" parent="MarginContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
