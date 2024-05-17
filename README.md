@@ -34,20 +34,11 @@ Create a file "config.ini" in the configuration directory with the following con
 [main]
 nickname="rpWTF" # capitalization does not matter
 channel="rpwtf"
-```
-
-Where `nick` is your twitch.tv nickname and `channel` is the target channel for the chatbot/chat overlay.
-
-### Authentication data
-
-Acquire an OAuth user access token following the steps outlined [here](https://dev.twitch.tv/docs/irc/authenticate-bot/) (make sure to include the "moderator:read:followers" scope as required by the `channel.follow` [event](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelfollow)).
-
-Create a file called "access.ini" with the following structure:
-
-```ini
-[auth]
 client_id="8c111f1b955a94fefbe03e762145f418"
-access_token="ea9b2060a024022a71ea6fa088f099ae"
 ```
 
-Where `client_id` is the client id of your Twitch application and `access_token` is the token you, hopefully, acquired in the previous step.
+Where `nick` is your twitch.tv nickname, `channel` is the target channel for the chatbot/chat overlay and `client_id` is the client id of your Twitch application.
+
+### Authentication
+
+An OAuth token will be fetched on the first run, or if you launch the application with the `--auth` argument.

@@ -55,14 +55,19 @@ static func parse_capabilities(capabilities_block: String) -> Dictionary:
 
 
 func _ready() -> void:
+	set_process(false)
 	if Constants.TEST_ARG in OS.get_cmdline_args():
 		_integration_test()
-		set_process(false)
 		return
 
 	_nickname = ConfigurationManager.nickname
 	_channel = ConfigurationManager.channel
-	_client.connect_to_url(TWITCH_IRC_ADDRESS)
+
+	TokenServer.token_acquired.connect(
+		func (_token: String) -> void:
+			set_process(true)
+			_client.connect_to_url(TWITCH_IRC_ADDRESS)
+	)
 
 
 func send_privmsg(text: String) -> void:
@@ -126,7 +131,7 @@ func _process_line(line: String) -> void:
 func _send_auth() -> void:
 	_auth_sent = true
 	_client.send_text("CAP REQ :twitch.tv/membership twitch.tv/tags twitch.tv/commands")
-	_client.send_text("PASS oauth:%s" % ConfigurationManager.access_token)
+	_client.send_text("PASS oauth:%s" % TokenServer.access_token)
 	_client.send_text("NICK %s" % _nickname)
 	_client.send_text("JOIN %s" % _channel)
 

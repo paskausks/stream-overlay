@@ -27,13 +27,16 @@ var _emote_data: Dictionary = {}
 # TODO(rp): ANIMATED GIFS: https://github.com/BOTLANNER/godot-gif
 
 func _ready() -> void:
+	TokenServer.token_acquired.connect(
+		func (_token: String) -> void: _get_emotes()
+	)
+
 	if not DirAccess.dir_exists_absolute(EMOTE_STORAGE):
 		DirAccess.make_dir_absolute(EMOTE_STORAGE)
 
 	_client_id = ConfigurationManager.client_id
 	_request_container = Node.new()
 	add_child(_request_container)
-	_get_emotes()
 
 
 func is_emote(emote_key_candidate: String) -> bool:
@@ -73,7 +76,7 @@ func _get_emotes() -> void:
 	var _http_request := _get_http_request()
 
 	var headers: PackedStringArray = [
-		"Authorization: Bearer %s" % ConfigurationManager.access_token,
+		"Authorization: Bearer %s" % TokenServer.access_token,
 		"Client-Id: %s" % _client_id,
 	]
 

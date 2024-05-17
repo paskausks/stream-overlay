@@ -19,7 +19,12 @@ var _test_mode: bool = Constants.TEST_ARG in OS.get_cmdline_args()
 
 
 func _ready() -> void:
-	_client.connect_to_url(EVENTSUB_ADDR_MOCK if _test_mode else EVENTSUB_ADDR)
+	set_process(false)
+	TokenServer.token_acquired.connect(
+		func (_token: String) -> void:
+			set_process(true)
+			_client.connect_to_url(EVENTSUB_ADDR_MOCK if _test_mode else EVENTSUB_ADDR)
+	)
 
 
 func _process(_delta: float) -> void:
@@ -62,7 +67,7 @@ func _subscribe(json_string: String) -> void:
 
 	var headers: PackedStringArray = [
 		# requires the "moderator:read:followers" scope
-		"Authorization: Bearer %s" % ConfigurationManager.access_token,
+		"Authorization: Bearer %s" % TokenServer.access_token,
 		"Client-Id: %s" % ConfigurationManager.client_id,
 		"Content-Type: application/json"
 	]
