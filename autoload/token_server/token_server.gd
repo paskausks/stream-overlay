@@ -19,6 +19,7 @@ const COLON_URIENCODED: String = "%3A"
 
 var _server: TCPServer = TCPServer.new()
 var _listen_thread: Thread = Thread.new()
+var _threads: Array[Thread] = []
 var access_token: String = ""
 
 
@@ -52,12 +53,22 @@ func _create_request_thread() -> void:
 	if not _server.is_listening():
 		return
 
+	# sometimes throws with
+	# E 0:00:01:0901   token_server.gd:55 @ _create_request_thread(): Condition "!is_open()" is true. Returning: out
+    # <C++ Source>   drivers/unix/net_socket_posix.cpp:771 @ accept()
 	var connection: StreamPeerTCP = _server.take_connection()
 
 	if not connection:
 		return
 
 	var thread: Thread = Thread.new()
+
+	# if i don't push them in this list, i get warnings, like:
+	# "Thread: A Thread object is being destroyed without its completion having been realized"
+	# while the program is still running, and the TokenServer node is still
+	# in the tree
+	_threads.push_back(thread)
+
 	thread.start(_handle_request.bind(connection))
 
 
