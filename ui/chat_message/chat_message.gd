@@ -43,7 +43,7 @@ func _set_nick(v: String) -> void:
 	if not nick_label or not v is String:
 		return
 
-	nick_label.text = v
+	nick_label.text = v + ":"
 
 
 func _set_nick_color(v: Color) -> void:
