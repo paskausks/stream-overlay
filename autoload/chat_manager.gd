@@ -33,16 +33,26 @@ static func parse_line(line: String) -> IRCMessageBase:
 static func parse_privmsg(line: String) -> IRCMessage:
 	var parts: PackedStringArray = line.split(" :")
 	var capabilities_dict: Dictionary = parse_capabilities(parts[0])
-	var badges: Array[String] = (capabilities_dict.get(CAPABILITY_BADGES, "") as String).split(",")
 	var message: String = "".join(parts.slice(2)).strip_edges()
 	var color: String = (capabilities_dict.get("color") as String).strip_edges()
+
+	# badges are "/"-separated strings e.g. "moderator/1" where "moderator"
+	# is the set id and "1" is the "id" of the version in the set.
+	var badges: Array[String] = (capabilities_dict.get(CAPABILITY_BADGES, "") as String).split(",")
 
 	return IRCMessage.new(
 		capabilities_dict.get("id") as String,
 		capabilities_dict.get("display-name") as String,
 		Color.html(color if len(color) else "#FFFFFF"),
 		message,
-		badges,
+		badges.map(
+			func (raw_badge_entry: String) -> IRCMessage.BadgeEntry:
+				var badge_parts: PackedStringArray = raw_badge_entry.split("/")
+				return IRCMessage.BadgeEntry.new(
+					badge_parts[0],
+					badge_parts[1]
+				),
+		),
 	)
 
 
@@ -148,11 +158,11 @@ func _integration_test() -> void:
 	var delay: float = 0.5
 
 	var msg1: IRCMessage = IRCMessage.new("1", "manlypink", Color.RED, "hello world! Kappa", [])
-	var msg2: IRCMessage = IRCMessage.new("2", "nat", Color.GRAY, "BabyRage", ["no_video/1"])
-	var msg3: IRCMessage = IRCMessage.new("3", "vito", Color.GREEN, "this is my favorite stream, LUL ig", ["no_video/1"])
-	var msg4: IRCMessage = IRCMessage.new("4", "duck", Color.GOLD, "C++ is the GOAT CoolCat", ["no_video/1"])
-	var msg5: IRCMessage = IRCMessage.new("5", "linus_torwalds", Color.LIME, "Nihil exercitationem est vero placeat fugit laborum. Animi autem amet aut laborum molestiae ut. PogChamp Consequatur deleniti voluptatem et inventore eligendi laboriosam molestias sed. Consectetur ab aut velit blanditiis. Neque enim architecto et eaque esse labore earum.", ["no_video/1"])
-	var msg6: IRCMessage = IRCMessage.new("6", "linus_tt", Color.PERU, "Nobis non veritatis nihil incidunt magni saepe laudantium. Qui eos dolorum sunt itaque. Autem tenetur beatae tempora. Quo in est reprehenderit corporis molestias ad sint totam. Qui voluptas dolor harum. Aliquid tenetur modi deserunt delectus perferendis assumenda.", ["no_video/1"])
+	var msg2: IRCMessage = IRCMessage.new("2", "nat", Color.GRAY, "BabyRage", [IRCMessage.BadgeEntry.new("no_video", "1")])
+	var msg3: IRCMessage = IRCMessage.new("3", "vito", Color.GREEN, "this is my favorite stream, LUL ig", [IRCMessage.BadgeEntry.new("no_video", "1")])
+	var msg4: IRCMessage = IRCMessage.new("4", "duck", Color.GOLD, "C++ is the GOAT CoolCat", [IRCMessage.BadgeEntry.new("no_video", "1")])
+	var msg5: IRCMessage = IRCMessage.new("5", "linus_torwalds", Color.LIME, "Nihil exercitationem est vero placeat fugit laborum. Animi autem amet aut laborum molestiae ut. PogChamp Consequatur deleniti voluptatem et inventore eligendi laboriosam molestias sed. Consectetur ab aut velit blanditiis. Neque enim architecto et eaque esse labore earum.", [IRCMessage.BadgeEntry.new("no_video", "1")])
+	var msg6: IRCMessage = IRCMessage.new("6", "linus_tt", Color.PERU, "Nobis non veritatis nihil incidunt magni saepe laudantium. Qui eos dolorum sunt itaque. Autem tenetur beatae tempora. Quo in est reprehenderit corporis molestias ad sint totam. Qui voluptas dolor harum. Aliquid tenetur modi deserunt delectus perferendis assumenda.", [IRCMessage.BadgeEntry.new("no_video", "1")])
 
 	var messages: Array[IRCMessage] = [
 		msg1,

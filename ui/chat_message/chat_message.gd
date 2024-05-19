@@ -12,6 +12,9 @@ const ChatMessageLabelSettings: Resource = preload("res://ui/chat_message_label_
 @export var content: String:
 	set = _set_content
 
+var badges: Array[IRCMessage.BadgeEntry]:
+	set = _set_badges
+
 @onready var nick_label: Label = %NickLabel
 @onready var content_container: Container = %ContentContainer
 
@@ -78,6 +81,18 @@ func _set_content(v: String) -> void:
 		var label: Label = ChatMessageFragmentScene.instantiate()
 		label.text = part
 		content_container.add_child(label)
+
+
+func _set_badges(v: Array[IRCMessage.BadgeEntry]) -> void:
+	badges = v
+	for badge_entry in badges:
+		BadgeManager.get_badge(
+			badge_entry.set_id,
+			badge_entry.version_id,
+			func (texture: Texture2D) -> void:
+				# assign badge texture to somewhere
+				pass
+		)
 
 
 func _get_fallback_color(color: Color) -> Color:
