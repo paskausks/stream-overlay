@@ -20,8 +20,10 @@ config/icon="res://icon.png"
 [autoload]
 
 Constants="*res://autoload/constants.gd"
+HTTP="*res://autoload/http/http.gd"
 ConfigurationManager="*res://autoload/configuration_manager.gd"
 EmoteManager="*res://autoload/emote_manager.gd"
+BadgeManager="*res://autoload/badge_manager.gd"
 ChatManager="*res://autoload/chat_manager.gd"
 CommandManager="*res://autoload/command_manager.gd"
 EventSub="*res://autoload/eventsub.gd"

@@ -16,10 +16,7 @@ const EMOTE_TEMPLATE_FORMAT := "format"
 const EMOTE_TEMPLATE_THEME_MODE := "theme_mode"
 const EMOTE_TEMPLATE_SCALE := "scale"
 
-var _client_id: String
 var _emote_url_template: String
-
-var _request_container: Node # TODO(rp): node cleanup in container (max treshold?)
 
 ## String -> EmoteData
 var _emote_data: Dictionary = {}
@@ -33,10 +30,6 @@ func _ready() -> void:
 
 	if not DirAccess.dir_exists_absolute(EMOTE_STORAGE):
 		DirAccess.make_dir_absolute(EMOTE_STORAGE)
-
-	_client_id = ConfigurationManager.client_id
-	_request_container = Node.new()
-	add_child(_request_container)
 
 
 func is_emote(emote_key_candidate: String) -> bool:
@@ -65,7 +58,7 @@ func get_emote_texture(emote_key: String, texture_callback: Callable) -> void:
 
 
 func _request_emote(url: String, response_handler: Callable) -> void:
-	var http_request := _get_http_request()
+	var http_request := HTTP.get_http_request()
 	var result: Error = http_request.request(url)
 	if result != OK:
 		push_error("An error occurred in the HTTP request: %s" % url)
@@ -73,30 +66,16 @@ func _request_emote(url: String, response_handler: Callable) -> void:
 
 
 func _get_emotes() -> void:
-	var _http_request := _get_http_request()
-
-	var headers: PackedStringArray = [
-		"Authorization: Bearer %s" % TokenServer.access_token,
-		"Client-Id: %s" % _client_id,
-	]
-
+	var _http_request := HTTP.get_http_request()
 	_http_request.request_completed.connect(_on_emote_data_request_completed, CONNECT_ONE_SHOT)
 
-	var result: Error = _http_request.request(EMOTE_DATA_URL, headers)
+	var result: Error = _http_request.request(EMOTE_DATA_URL)
 	if result != OK:
-		push_error("An error occurred in the HTTP request.")
-
-
-func _get_http_request() -> HTTPRequest:
-	var http_request := HTTPRequest.new()
-	_request_container.add_child(http_request)
-	return http_request
+		push_error("An error occurred in the HTTP request when fetching emotes.")
 
 
 func _on_emote_data_request_completed(_res: Error, _code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
-	var json := JSON.new()
-	json.parse(body.get_string_from_utf8())
-	var response: Dictionary = json.get_data()
+	var response: Dictionary = HTTP.get_response_dict(body)
 
 	_emote_url_template = response.get(RES_KEY_TEMPLATE)
 
