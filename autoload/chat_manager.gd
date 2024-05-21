@@ -38,21 +38,22 @@ static func parse_privmsg(line: String) -> IRCMessage:
 
 	# badges are "/"-separated strings e.g. "moderator/1" where "moderator"
 	# is the set id and "1" is the "id" of the version in the set.
-	var badges: Array[String] = (capabilities_dict.get(CAPABILITY_BADGES, "") as String).split(",")
+	var badges: PackedStringArray = (capabilities_dict.get(CAPABILITY_BADGES, "") as String).split(",")
+	var badge_entries: Array[IRCMessage.BadgeEntry] = []
+
+	for raw_badge_entry: String in badges:
+		var badge_parts: PackedStringArray = raw_badge_entry.split("/")
+		badge_entries.append(IRCMessage.BadgeEntry.new(
+			badge_parts[0],
+			badge_parts[1]
+		))
 
 	return IRCMessage.new(
 		capabilities_dict.get("id") as String,
 		capabilities_dict.get("display-name") as String,
 		Color.html(color if len(color) else "#FFFFFF"),
 		message,
-		badges.map(
-			func (raw_badge_entry: String) -> IRCMessage.BadgeEntry:
-				var badge_parts: PackedStringArray = raw_badge_entry.split("/")
-				return IRCMessage.BadgeEntry.new(
-					badge_parts[0],
-					badge_parts[1]
-				),
-		),
+		badge_entries,
 	)
 
 
