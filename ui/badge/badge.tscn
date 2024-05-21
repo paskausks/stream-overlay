@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://du3wxkt8tafcp"]
+
+[ext_resource type="Script" path="res://ui/badge/badge.gd" id="1_x3gil"]
+
+[node name="Badge" type="MarginContainer"]
+theme_override_constants/margin_bottom = 4
+script = ExtResource("1_x3gil")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+expand_mode = 1

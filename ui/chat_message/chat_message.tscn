@@ -1,27 +1,35 @@
-[gd_scene load_steps=2 format=3 uid="uid://d1fdcxrjpxq7k"]
+[gd_scene load_steps=3 format=3 uid="uid://d1fdcxrjpxq7k"]
 
 [ext_resource type="Script" path="res://ui/chat_message/chat_message.gd" id="1_3kncx"]
+[ext_resource type="LabelSettings" uid="uid://bmxmpqaa0njc" path="res://ui/chat_message_label_settings.tres" id="3_d5uo7"]
 
 [node name="ChatMessage" type="VBoxContainer"]
-anchors_preset = 10
+anchors_preset = 15
 anchor_right = 1.0
-offset_bottom = 23.0
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_3kncx")
 
 [node name="MarginContainer2" type="MarginContainer" parent="."]
 layout_mode = 2
+size_flags_vertical = 0
 theme_override_constants/margin_bottom = 8
 
 [node name="HeaderContainer" type="HBoxContainer" parent="MarginContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 6
 
 [node name="NickLabel" type="Label" parent="MarginContainer2/HeaderContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 1
+text = "rpWTF"
+label_settings = ExtResource("3_d5uo7")
+vertical_alignment = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2

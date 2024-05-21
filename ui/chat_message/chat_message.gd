@@ -3,6 +3,7 @@ extends Container
 
 const NICKNAME_LUMINANCE_THRESHOLD: float = 0.33
 const ChatMessageFragmentScene: PackedScene = preload("res://ui/chat_message_fragment.tscn")
+const BadgeScene: PackedScene = preload("res://ui/badge/badge.tscn")
 const ChatMessageLabelSettings: Resource = preload("res://ui/chat_message_label_settings.tres")
 
 @export var nick: String:
@@ -19,6 +20,8 @@ var badges: Array[IRCMessage.BadgeEntry]:
 @onready var content_container: Container = %ContentContainer
 @onready var header_container: Container = %HeaderContainer
 
+# TODO(rp): add message grouping - cache last message and if
+# author is the same - just add the message to the last one.
 
 
 func _ready() -> void:
@@ -93,14 +96,14 @@ func _set_badges(v: Array[IRCMessage.BadgeEntry]) -> void:
 		return
 
 	for badge_entry in badges:
-		var texture_rect: TextureRect = TextureRect.new()
-		header_container.add_child(texture_rect)
-		header_container.move_child(texture_rect, 0)
+		var badge: Badge = BadgeScene.instantiate()
+		header_container.add_child(badge)
+		header_container.move_child(badge, 0)
 		BadgeManager.get_badge(
 			badge_entry.set_id,
 			badge_entry.version_id,
 			func (texture: Texture2D) -> void:
-				texture_rect.texture = texture
+				badge.texture = texture
 		)
 
 
