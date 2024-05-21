@@ -5,6 +5,8 @@ const MAX_MESSAGES: int = 5
 
 @onready var message_container: Container = %MessageContainer
 
+var _last_message: ChatMessage
+
 
 func _ready() -> void:
 	if OS.is_debug_build():
@@ -20,13 +22,18 @@ func _unhandled_input(_event: InputEvent) -> void:
 
 
 func _on_chat_messaged(irc_message: IRCMessage) -> void:
-	var chat_message: ChatMessage = ChatMessageScene.instantiate()
-	chat_message.nick = irc_message.nick
-	chat_message.content = irc_message.content
-	chat_message.nick_color = irc_message.nick_color
-	chat_message.badges = irc_message.badges
-	message_container.add_child(chat_message)
+	if _last_message is ChatMessage and _last_message.nick == irc_message.nick:
+		_last_message.add_content(irc_message.content)
+	else:
+		var chat_message: ChatMessage = ChatMessageScene.instantiate()
+		chat_message.nick = irc_message.nick
+		chat_message.nick_color = irc_message.nick_color
+		chat_message.badges = irc_message.badges
+		chat_message.add_content(irc_message.content)
+		message_container.add_child(chat_message)
+		_last_message = chat_message
 
+	# FIXME(rp): cleanup needs to take grouped messages in account
 	var child_count: int = message_container.get_child_count()
 	var children := message_container.get_children()
 

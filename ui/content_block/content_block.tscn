@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://vdeyphfhmdwm"]
+
+[ext_resource type="Script" path="res://ui/content_block/content_block.gd" id="1_y85oy"]
+
+[node name="ContentBlock" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_bottom = 16
+script = ExtResource("1_y85oy")
+
+[node name="ContentContainer" type="HFlowContainer" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3

@@ -30,13 +30,3 @@ size_flags_vertical = 1
 text = "rpWTF"
 label_settings = ExtResource("3_d5uo7")
 vertical_alignment = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="."]
-layout_mode = 2
-theme_override_constants/margin_bottom = 16
-
-[node name="ContentContainer" type="HFlowContainer" parent="MarginContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-size_flags_horizontal = 3

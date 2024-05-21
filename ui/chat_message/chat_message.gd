@@ -3,6 +3,7 @@ extends Container
 
 const NICKNAME_LUMINANCE_THRESHOLD: float = 0.33
 const ChatMessageFragmentScene: PackedScene = preload("res://ui/chat_message_fragment.tscn")
+const ContentBlockScene: PackedScene = preload("res://ui/content_block/content_block.tscn")
 const BadgeScene: PackedScene = preload("res://ui/badge/badge.tscn")
 const ChatMessageLabelSettings: Resource = preload("res://ui/chat_message_label_settings.tres")
 
@@ -10,23 +11,16 @@ const ChatMessageLabelSettings: Resource = preload("res://ui/chat_message_label_
 	set = _set_nick
 @export var nick_color: Color = Color.WHITE:
 	set = _set_nick_color
-@export var content: String:
-	set = _set_content
 
 var badges: Array[IRCMessage.BadgeEntry]:
 	set = _set_badges
 
 @onready var nick_label: Label = %NickLabel
-@onready var content_container: Container = %ContentContainer
 @onready var header_container: Container = %HeaderContainer
-
-# TODO(rp): add message grouping - cache last message and if
-# author is the same - just add the message to the last one.
 
 
 func _ready() -> void:
 	_set_nick(nick)
-	_set_content(content)
 	_set_nick_color(nick_color)
 	_set_badges(badges)
 
@@ -40,6 +34,30 @@ func get_nick_width() -> float:
 		return 0
 
 	return nick_label.size.x
+
+
+func add_content(content: String) -> void:
+	var content_block: ContentBlock = ContentBlockScene.instantiate()
+
+	if not content is String:
+		return
+
+	var parts: PackedStringArray = content.split(" ")
+	for part: String in parts:
+		if EmoteManager.is_emote(part):
+			var texture_rect: TextureRect = TextureRect.new()
+			content_block.add_content_fragment(texture_rect)
+			EmoteManager.get_emote_texture(
+				part,
+				func (texture: Texture2D) -> void:
+					texture_rect.texture = texture
+			)
+			continue
+
+		var label: Label = ChatMessageFragmentScene.instantiate()
+		label.text = part
+		content_block.add_content_fragment(label)
+	add_child(content_block)
 
 
 func set_nick_width(width: float) -> void:
@@ -64,29 +82,6 @@ func _set_nick_color(v: Color) -> void:
 	var label_settings: LabelSettings = ChatMessageLabelSettings.duplicate()
 	label_settings.font_color = _get_fallback_color(v)
 	nick_label.label_settings = label_settings
-
-
-func _set_content(v: String) -> void:
-	content = v
-
-	if not content_container or not v is String:
-		return
-
-	var parts: PackedStringArray = v.split(" ")
-	for part: String in parts:
-		if EmoteManager.is_emote(part):
-			var texture_rect: TextureRect = TextureRect.new()
-			content_container.add_child(texture_rect)
-			EmoteManager.get_emote_texture(
-				part,
-				func (texture: Texture2D) -> void:
-					texture_rect.texture = texture
-			)
-			continue
-
-		var label: Label = ChatMessageFragmentScene.instantiate()
-		label.text = part
-		content_container.add_child(label)
 
 
 func _set_badges(v: Array[IRCMessage.BadgeEntry]) -> void:
