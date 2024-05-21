@@ -36,6 +36,7 @@ func is_emote(emote_key_candidate: String) -> bool:
 	return _emote_data.has(_get_normalized_emote_key(emote_key_candidate))
 
 
+## texture_callback expects to be called witha Texture2D
 func get_emote_texture(emote_key: String, texture_callback: Callable) -> void:
 	var normalized_key: String = _get_normalized_emote_key(emote_key)
 
@@ -46,23 +47,19 @@ func get_emote_texture(emote_key: String, texture_callback: Callable) -> void:
 	if data.texture is Texture2D:
 		return texture_callback.call(data.texture)
 
-	var request_callback: Callable = func (_r: Error, _c: int, _h: PackedStringArray, body: PackedByteArray) -> void:
-		texture_callback.call(_get_texture_for(normalized_key, body))
-
 	var path: String = _get_emote_cache_path(normalized_key)
-	if FileAccess.file_exists(path):
-		var image: Image = Image.load_from_file(path)
-		texture_callback.call(ImageTexture.create_from_image(image))
+
+	var cached_texture: Texture2D = ImageUtils.get_texture_from_disk(path)
+	if cached_texture is Texture2D:
+		texture_callback.call(cached_texture)
 	else:
-		_request_emote(_get_emote_url(data.id), request_callback)
-
-
-func _request_emote(url: String, response_handler: Callable) -> void:
-	var http_request := HTTP.get_http_request()
-	var result: Error = http_request.request(url)
-	if result != OK:
-		push_error("An error occurred in the HTTP request: %s" % url)
-	http_request.request_completed.connect(response_handler, CONNECT_ONE_SHOT)
+		ImageUtils.cache_texture(
+			_get_emote_url(data.id),
+			path,
+			func (texture: Texture2D) -> void:
+				texture_callback.call(texture)
+				data.texture = texture
+		)
 
 
 func _get_emotes() -> void:
@@ -88,20 +85,6 @@ func _on_emote_data_request_completed(_res: Error, _code: int, _headers: PackedS
 		emote_data.is_animated = "animated" in emote_entry.get(RES_KEY_FORMATS)
 
 		_emote_data[_get_normalized_emote_key(emote_name)] = emote_data
-
-
-func _get_texture_for(emote_key: String, body: PackedByteArray) -> Texture2D:
-	var path: String = _get_emote_cache_path(emote_key)
-	if not FileAccess.file_exists(path):
-		var image_file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
-		image_file.store_buffer(body)
-		image_file.close()
-
-	var data: EmoteData = _emote_data.get(emote_key) as EmoteData
-	var image: Image = Image.load_from_file(path)
-	var texture: ImageTexture = ImageTexture.create_from_image(image)
-	data.texture = texture
-	return texture
 
 
 ## theme mode "default" - return animated emote url if that exists, otherwise

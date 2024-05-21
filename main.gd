@@ -12,6 +12,13 @@ func _ready() -> void:
 	ChatManager.chat_messaged.connect(_on_chat_messaged)
 
 
+func _unhandled_input(_event: InputEvent) -> void:
+	if not Input.is_action_just_pressed("ui_cancel"):
+		return
+
+	_quit()
+
+
 func _on_chat_messaged(irc_message: IRCMessage) -> void:
 	var chat_message: ChatMessage = ChatMessageScene.instantiate()
 	chat_message.nick = irc_message.nick
@@ -35,3 +42,9 @@ func _on_chat_messaged(irc_message: IRCMessage) -> void:
 
 	for message: ChatMessage in message_container.get_children():
 		message.set_nick_width(widest_nick)
+
+
+func _quit() -> void:
+	var tree: SceneTree = get_tree()
+	tree.root.propagate_notification(NOTIFICATION_WM_CLOSE_REQUEST)
+	tree.quit()

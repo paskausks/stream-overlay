@@ -52,7 +52,8 @@ func test_parse_privmsg1() -> void:
 		"357da145-6b71-4e8f-8eed-f1d4a73abbf6",
 		"catsarethebest48",
 		Color.WHITE,
-		"my dogs are in shambles #GoCatsGo"
+		"my dogs are in shambles #GoCatsGo",
+		[]
 	)
 
 	assert_object(ChatManager.parse_privmsg(input)).is_equal(expected)
@@ -65,7 +66,8 @@ func test_parse_privmsg2() -> void:
 		"12f77484-a576-4435-a32f-fb57e08e393f",
 		"DirtySouth2008",
 		Color.html("#0000FF"),
-		"mbushCool mbushCool"
+		"mbushCool mbushCool",
+		[IRCMessage.BadgeEntry.new("premium", "1")]
 	)
 
 	assert_object(ChatManager.parse_privmsg(input)).is_equal(expected)

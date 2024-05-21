@@ -12,8 +12,12 @@ func _ready() -> void:
 		func (_token: String) -> void: _get_badges()
 	)
 
+	if not DirAccess.dir_exists_absolute(BADGE_STORAGE):
+		DirAccess.make_dir_absolute(BADGE_STORAGE)
 
-func get_badge(set_id: String, version_id: String, callback: Callable) -> void:
+
+## texture_callback expects to be called witha Texture2D
+func get_badge(set_id: String, version_id: String, texture_callback: Callable) -> void:
 	if not set_id in _badge_data:
 		push_warning("Set id %s not found!" % set_id)
 		return
@@ -25,6 +29,27 @@ func get_badge(set_id: String, version_id: String, callback: Callable) -> void:
 		return
 
 	var badge_version: BadgeVersion = badge_data.versions[version_id]
+	if badge_version.texture:
+		texture_callback.call(badge_version.texture)
+		return
+
+	var path: String = _create_badge_path(set_id, version_id)
+	var cached_texture: Texture2D = ImageUtils.get_texture_from_disk(path)
+	if cached_texture is Texture2D:
+		texture_callback.call(cached_texture)
+		return
+	else:
+		ImageUtils.cache_texture(
+			badge_version.image_url_2x,
+			path,
+			func (texture: Texture2D) -> void:
+				texture_callback.call(texture)
+				badge_version.texture = texture
+		)
+
+
+func _create_badge_path(set_id: String, version_id: String) -> String:
+	return "%s%s_%s.png" % [BADGE_STORAGE, set_id, version_id]
 
 
 func _get_badges() -> void:
@@ -48,6 +73,7 @@ func _on_badge_data_request_completed(_r: int, _code: int, _h: PackedStringArray
 			var version_id: String = version_dict.get("id")
 			set_version.id = version_id
 			set_version.image_url_1x = version_dict.get("image_url_1x")
+			set_version.image_url_2x = version_dict.get("image_url_2x")
 			versions[version_id] = set_version
 
 		var badge_data: BadgeData = BadgeData.new(set_id, versions)
@@ -68,4 +94,5 @@ class BadgeData:
 class BadgeVersion:
 	var id: String
 	var image_url_1x: String
+	var image_url_2x: String
 	var texture: Texture2D

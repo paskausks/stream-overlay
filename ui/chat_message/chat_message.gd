@@ -17,12 +17,15 @@ var badges: Array[IRCMessage.BadgeEntry]:
 
 @onready var nick_label: Label = %NickLabel
 @onready var content_container: Container = %ContentContainer
+@onready var header_container: Container = %HeaderContainer
+
 
 
 func _ready() -> void:
 	_set_nick(nick)
 	_set_content(content)
 	_set_nick_color(nick_color)
+	_set_badges(badges)
 
 
 func destroy() -> void:
@@ -85,13 +88,19 @@ func _set_content(v: String) -> void:
 
 func _set_badges(v: Array[IRCMessage.BadgeEntry]) -> void:
 	badges = v
+
+	if not header_container:
+		return
+
 	for badge_entry in badges:
+		var texture_rect: TextureRect = TextureRect.new()
+		header_container.add_child(texture_rect)
+		header_container.move_child(texture_rect, 0)
 		BadgeManager.get_badge(
 			badge_entry.set_id,
 			badge_entry.version_id,
 			func (texture: Texture2D) -> void:
-				# assign badge texture to somewhere
-				pass
+				texture_rect.texture = texture
 		)
 
 
